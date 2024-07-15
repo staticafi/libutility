@@ -87,17 +87,45 @@ std::size_t size(vec<T> const& v)
 }
 
 template<typename T>
-std::size_t rows(mat<T> const& m)
+std::size_t columns(mat<T> const& m)
 {
     return m.size();
 }
 
 template<typename T>
-std::size_t columns(mat<T> const& m)
+std::size_t rows(mat<T> const& m)
 {
     return m.empty() ? 0UL : m.front().size();
 }
 
+template<typename T>
+vec<T> const&  column(mat<T> const& m, std::size_t const i)
+{
+    return m.at(i);
+}
+
+template<typename T>
+vec<T>&  column(mat<T>& m, std::size_t const i)
+{
+    return m.at(i);
+}
+
+
+template<typename T, typename S>
+vec<T>& set(vec<T>& v, S const& value = S{0})
+{
+    for (std::size_t  i = 1UL; i < size(v); ++i)
+        at(v,i) = value;
+    return v;
+}
+
+
+template<typename T, typename S>
+vec<T>& reset(vec<T>& v, std::size_t const n, S const& value = S{0})
+{
+    v. resize(n);
+    return set(v, value);
+}
 
 
 template<typename T>
@@ -208,6 +236,22 @@ vec<T>& add(vec<T>& v, S const a)
 {
     for (std::size_t  i = 0UL; i != v.size(); ++i)
         at(v,i) += (T)a;
+    return v;
+}
+
+template<typename T>
+vec<T>& add(vec<T>& v, vec<T> const& u)
+{
+    for (std::size_t  i = 0UL; i != v.size(); ++i)
+        at(v,i) += at(u,i);
+    return v;
+}
+
+template<typename T, typename S>
+vec<T>& add_scaled(vec<T>& v, S const a, vec<T> const& u)
+{
+    for (std::size_t  i = 0UL; i != v.size(); ++i)
+        at(v,i) += (T)a * at(u,i);
     return v;
 }
 
@@ -354,6 +398,9 @@ void  generate_sample_of_hamming_class(vecb&  output_bits, std::size_t  num_bits
 void  generate_samples_of_hamming_class(vec<vecb>&  output_samples, std::size_t const  num_bits, std::size_t const  hamming_class,
                                         std::size_t const  num_samples_to_generate, random_generator_for_natural_32_bit&  generator);
 
+
+void  set_bit(natural_8_bit*  bytes, std::size_t  bit_index, bool  state);
+bool  get_bit(natural_8_bit const*  bytes, std::size_t  bit_index);
 
 void  bits_to_bytes(vecb const&  bits, vecu8&  bytes);
 void  bytes_to_bits(vecu8 const&  bytes, vecb&  bits);
