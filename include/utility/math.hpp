@@ -114,7 +114,7 @@ vec<T>&  column(mat<T>& m, std::size_t const i)
 template<typename T, typename S>
 vec<T>& set(vec<T>& v, S const& value = S{0})
 {
-    for (std::size_t  i = 1UL; i < size(v); ++i)
+    for (std::size_t  i = 0UL; i < size(v); ++i)
         at(v,i) = value;
     return v;
 }
@@ -125,6 +125,26 @@ vec<T>& reset(vec<T>& v, std::size_t const n, S const& value = S{0})
 {
     v. resize(n);
     return set(v, value);
+}
+
+
+template<typename T>
+vec<T>& axis(vec<T>& v, std::size_t const i)
+{
+    ASSUMPTION(i < size(v));
+    set(v, (T)0);
+    at(v, i) = (T)1;
+    return v;
+}
+
+
+template<typename T>
+vec<T>& axis(vec<T>& v, std::size_t const n, std::size_t const i)
+{
+    ASSUMPTION(i < n);
+    reset(v, n, (T)0);
+    at(v, i) = (T)1;
+    return v;
 }
 
 
