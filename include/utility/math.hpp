@@ -335,6 +335,24 @@ bool normalize_probabilities(vec<T>& v)
     return true;
 }
 
+template<typename T>
+vec<T> mul(mat<T> const& m, vec<T> const& v)
+{
+    vec<T> result;
+    reset(result, rows(m), (T)0);
+    for (std::size_t  i = 0UL; i != v.size(); ++i)
+        add_scaled(result, at(v, i), column(m, i));
+    return result;
+}
+
+template<typename T>
+vec<T>  component_of_first_orthogonal_to_second(vec<T> const&  u, vec<T> const&  v)
+{
+    vec<T> w{ u };
+    add_scaled(w, -dot_product(u, v) / dot_product(v, v), v);
+    return w;
+}
+
 natural_16_bit  hamming_distance(vecb const&  bits1, vecb const&  bits2);
 bool  copy_bits_to_bytes_array(natural_8_bit* output_bytes_array, std::size_t num_array_bytes, bool as_signed, vecb const&  bits, bool little_endian);
 
