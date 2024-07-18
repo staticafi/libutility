@@ -3,6 +3,7 @@
 
 #   include <utility/basic_numeric_types.hpp>
 #   include <utility/assumptions.hpp>
+#   include <utility/invariants.hpp>
 #   include <utility/hash_combine.hpp>
 #   include <utility/random.hpp>
 #   include <vector>
@@ -352,6 +353,127 @@ vec<T>  component_of_first_orthogonal_to_second(vec<T> const&  u, vec<T> const& 
     add_scaled(w, -dot_product(u, v) / dot_product(v, v), v);
     return w;
 }
+
+template<typename float_type>
+static float_type  small_delta_around(float_type const x)
+{
+    ASSUMPTION(std::isfinite(x) && !std::isnan(x));
+    int  x_exponent;
+    std::frexp(x, &x_exponent);
+    int const  delta_exponent{ x_exponent - (std::numeric_limits<decltype(x)>::digits >> 2) };
+    float_64_bit const  delta{ std::pow(2.0, delta_exponent) };
+    INVARIANT(std::isfinite(delta) && !std::isnan(delta));
+    if (std::isfinite(x + delta))
+    {
+        INVARIANT(x + delta != x);
+        return delta;
+    }
+    INVARIANT(std::isfinite(x - delta));
+    INVARIANT(x - delta != x);
+    return -delta;
+}
+
+
+template<typename float_type>
+struct  interval
+{
+    struct  bound
+    {
+        static inline bound inf_neg() { return { -std::numeric_limits<float_type>::infinity(), false }; }
+        static inline bound inf_pos() { return {  std::numeric_limits<float_type>::infinity(), false }; }
+
+        // bound() : value{ (float_type)0 }, inclusive{ true } {}
+
+        bool  isfinite() const { return std::isfinite(value); }
+
+        float_type value{ (float_type)0 };
+        bool inclusive{ false };
+    };
+
+    // interval() : lo{ bound::inf_neg() }, hi{ bound::inf_pos() } {}
+
+    bool  empty() const { return hi.value < lo.value || (hi.value == lo.value && (!hi.inclusive || !lo.inclusive)); }
+
+    bound  lo{ bound::inf_neg() };
+    bound  hi{ bound::inf_pos() };
+};
+
+template<typename float_type>
+interval<float_type>  intersection(interval<float_type> const&  a, interval<float_type> const&  b)
+{
+    if (a.empty()) return a;
+    if (b.empty()) return b;
+
+    interval<float_type>  result{};
+
+    if (a.lo.isfinite())
+    {
+        if (b.lo.isfinite())
+        {
+            if (a.lo.value == b.lo.value)
+            {
+                result.lo.value = a.lo.value;
+                result.lo.inclusive = a.lo.inclusive && b.lo.inclusive;
+            }
+            else
+                result.lo = a.lo.value < b.lo.value ? b.lo : a.lo;
+        }
+        else
+            result.lo = a.lo;
+    }
+    else
+        result.lo = b.lo;
+
+    if (a.hi.isfinite())
+    {
+        if (b.hi.isfinite())
+        {
+            if (a.hi.value == b.hi.value)
+            {
+                result.hi.value = a.hi.value;
+                result.hi.inclusive = a.hi.inclusive && b.hi.inclusive;
+            }
+            else
+                result.hi = a.hi.value < b.hi.value ? a.hi : b.hi;
+        }
+        else
+            result.hi = a.hi;
+    }
+    else
+        result.hi = b.hi;
+
+    return result;
+}
+
+template<typename float_type>
+float_type  lowest(interval<float_type> const&  a)
+{
+    ASSUMPTION(!a.empty() && a.lo.isfinite());
+    if (a.lo.inclusive)
+        return a.lo.value;
+    float_type const  result{ a.lo.value + std::fabs(small_delta_around(a.lo.value)) };
+    if (a.hi.isfinite() && (result > a.hi.value || (result == a.hi.value && !a.hi.inclusive)))
+        return (a.lo.value + a.hi.value) / (float_type)2;
+    INVARIANT(std::isfinite(result));
+    return result;
+}
+
+template<typename float_type>
+float_type  highest(interval<float_type> const&  a)
+{
+    ASSUMPTION(!a.empty() && a.hi.isfinite());
+    if (a.hi.inclusive)
+        return a.hi.value;
+    float_type const  result{ a.hi.value - std::fabs(small_delta_around(a.hi.value)) };
+    if (a.lo.isfinite() && (result < a.lo.value || (result == a.lo.value && !a.lo.inclusive)))
+        return (a.lo.value + a.hi.value) / (float_type)2;
+    INVARIANT(std::isfinite(result));
+    return result;
+}
+
+using intervalf32 = interval<float_32_bit>;
+using intervalf64 = interval<float_64_bit>;
+
 
 natural_16_bit  hamming_distance(vecb const&  bits1, vecb const&  bits2);
 bool  copy_bits_to_bytes_array(natural_8_bit* output_bytes_array, std::size_t num_array_bytes, bool as_signed, vecb const&  bits, bool little_endian);
