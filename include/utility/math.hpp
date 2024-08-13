@@ -213,6 +213,28 @@ T sum(vec<T> const& v)
 }
 
 template<typename T>
+T max_abs(vec<T> const& v)
+{
+    if (v.empty())
+        return (T)0;
+    T  result = std::abs(v.front());
+    for (std::size_t  i = 1UL; i != v.size(); ++i)
+        result = std::max(std::abs(at(v,i)), result);
+    return result;
+}
+
+template<typename T>
+T min_abs(vec<T> const& v)
+{
+    if (v.empty())
+        return (T)0;
+    T  result = std::abs(v.front());
+    for (std::size_t  i = 1UL; i != v.size(); ++i)
+        result = std::min(std::abs(at(v,i)), result);
+    return result;
+}
+
+template<typename T>
 float_32_bit avg(vec<T> const& v)
 {
     return v.empty() ? 0.0f : (float_32_bit)sum(v) / (float_32_bit)v.size();
