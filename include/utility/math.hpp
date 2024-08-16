@@ -289,6 +289,21 @@ vec<T> add_cp(vec<T> const& v, vec<T> const& u)
     return add(result, u);
 }
 
+template<typename T>
+vec<T>& sub(vec<T>& v, vec<T> const& u)
+{
+    for (std::size_t  i = 0UL; i != v.size(); ++i)
+        at(v,i) -= at(u,i);
+    return v;
+}
+
+template<typename T>
+vec<T> sub_cp(vec<T> const& v, vec<T> const& u)
+{
+    vec<T> result{ v };
+    return sub(result, u);
+}
+
 template<typename T, typename S>
 vec<T>& add_scaled(vec<T>& v, S const a, vec<T> const& u)
 {
@@ -307,6 +322,32 @@ template<typename T>
 vec<T> negate_cp(vec<T> const& v)
 {
     return scale_cp(v, (T)-1);
+}
+
+template<typename T>
+vec<T> invert(vec<T> const& v)
+{
+    vec<T> w;
+    for (std::size_t  i = 0UL; i != v.size(); ++i)
+        w.push_back( at(v,i) != (T)0 ? (T)1 / at(v,i) : (T)0 );
+    return v;
+}
+
+template<typename T>
+vec<T> invert_cp(vec<T> const& v)
+{
+    vec<T> u{ v };
+    invert(u);
+    return u;
+}
+
+template<typename T>
+vec<T> modulate(vec<T> const& v, vec<T> const& u)
+{
+    vec<T> w;
+    for (std::size_t  i = 0UL; i != v.size(); ++i)
+        w.push_back(at(v,i) * at(u,i));
+    return w;
 }
 
 template<typename T>
