@@ -274,14 +274,6 @@ vec<T> power_cp(vec<T> const& v, S const exponent)
     return result;
 }
 
-template<typename T, typename S>
-vec<T>& add(vec<T>& v, S const a)
-{
-    for (std::size_t  i = 0UL; i != v.size(); ++i)
-        at(v,i) += (T)a;
-    return v;
-}
-
 template<typename T>
 vec<T>& add(vec<T>& v, vec<T> const& u)
 {
@@ -290,21 +282,19 @@ vec<T>& add(vec<T>& v, vec<T> const& u)
     return v;
 }
 
+template<typename T>
+vec<T> add_cp(vec<T> const& v, vec<T> const& u)
+{
+    vec<T> result{ v };
+    return add(result, u);
+}
+
 template<typename T, typename S>
 vec<T>& add_scaled(vec<T>& v, S const a, vec<T> const& u)
 {
     for (std::size_t  i = 0UL; i != v.size(); ++i)
         at(v,i) += (T)a * at(u,i);
     return v;
-}
-
-template<typename T, typename S>
-vec<T> add_cp(vec<T> const& v, S const a)
-{
-    vec<T> result = v;
-    for (std::size_t  i = 0UL; i != v.size(); ++i)
-        at(result,i) += (T)a;
-    return result;
 }
 
 template<typename T>
