@@ -213,6 +213,15 @@ T sum(vec<T> const& v)
 }
 
 template<typename T>
+T sum_abs(vec<T> const& v)
+{
+    T  result = (T)0;
+    for (std::size_t  i = 0UL; i != v.size(); ++i)
+        result += std::abs(at(v,i));
+    return result;
+}
+
+template<typename T>
 T max_abs(vec<T> const& v)
 {
     if (v.empty())
@@ -312,6 +321,14 @@ vec<T>& add_scaled(vec<T>& v, S const a, vec<T> const& u)
     return v;
 }
 
+template<typename T, typename S>
+vec<T> add_scaled_cp(vec<T> const& v, S const a, vec<T> const& u)
+{
+    vec<T> result{ v };
+    add_scaled(result, a, u);
+    return result;
+}
+
 template<typename T>
 vec<T>& negate(vec<T>& v)
 {
@@ -329,8 +346,8 @@ vec<T> invert(vec<T> const& v)
 {
     vec<T> w;
     for (std::size_t  i = 0UL; i != v.size(); ++i)
-        w.push_back( at(v,i) != (T)0 ? (T)1 / at(v,i) : (T)0 );
-    return v;
+        w.push_back((T)1 / at(v,i));
+    return w;
 }
 
 template<typename T>
