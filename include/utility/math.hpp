@@ -394,6 +394,16 @@ bool normalize(vec<T>& v)
     return true;
 }
 
+template<typename float_type>
+bool is_finite(vec<float_type> const& v)
+{
+    static_assert(std::is_floating_point<float_type>::value, "");
+    for (std::size_t  i = 0UL; i != v.size(); ++i)
+        if (!std::isfinite(at(v,i)) || std::isnan(at(v,i)))
+            return false;
+    return true;
+}
+
 template<typename T>
 bool normalize_probabilities(vec<T>& v)
 {
@@ -425,8 +435,9 @@ vec<T>  component_of_first_orthogonal_to_second(vec<T> const&  u, vec<T> const& 
 }
 
 template<typename float_type>
-static float_type  small_delta_around(float_type const x)
+float_type  small_delta_around(float_type const x)
 {
+    static_assert(std::is_floating_point<float_type>::value, "Function works only for floating point types.");
     ASSUMPTION(std::isfinite(x) && !std::isnan(x));
     int  x_exponent;
     std::frexp(x, &x_exponent);
