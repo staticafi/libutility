@@ -395,7 +395,7 @@ bool normalize(vec<T>& v)
 }
 
 template<typename float_type>
-bool is_finite(vec<float_type> const& v)
+bool isfinite(vec<float_type> const& v)
 {
     static_assert(std::is_floating_point<float_type>::value, "");
     for (std::size_t  i = 0UL; i != v.size(); ++i)
