@@ -438,20 +438,17 @@ template<typename float_type>
 float_type  small_delta_around(float_type const x)
 {
     static_assert(std::is_floating_point<float_type>::value, "Function works only for floating point types.");
-    ASSUMPTION(std::isfinite(x) && !std::isnan(x));
+    if (!std::isfinite(x) || std::isnan(x))
+        return (float_type)0;
     int  x_exponent;
     std::frexp(x, &x_exponent);
     int const  delta_exponent{ x_exponent - (std::numeric_limits<decltype(x)>::digits >> 2) };
     float_64_bit const  delta{ std::pow(2.0, delta_exponent) };
-    INVARIANT(std::isfinite(delta) && !std::isnan(delta));
-    if (std::isfinite(x + delta))
-    {
-        INVARIANT(x + delta != x);
+    if (std::isfinite(x + delta) && !std::isnan(x + delta) && x + delta != x)
         return delta;
-    }
-    INVARIANT(std::isfinite(x - delta));
-    INVARIANT(x - delta != x);
-    return -delta;
+    else if (std::isfinite(x - delta) && !std::isnan(x - delta) && x - delta != x)
+        return delta;
+    return (float_type)0;
 }
 
 
