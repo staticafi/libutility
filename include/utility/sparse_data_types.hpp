@@ -44,10 +44,6 @@ inline sparse_vector  operator/(sparse_vector const&  v, scalar const  c) { retu
 
 struct  sparse_orthogonal_basis
 {
-    explicit sparse_orthogonal_basis(std::size_t  num_dimensions) : dim_{ num_dimensions }, vectors_{} {}
-
-    std::size_t  size() const { return dim_; }
-
     sparse_vector  operator()(std::size_t  idx) const;
     sparse_vector&  operator[](std::size_t  idx);
 
@@ -59,7 +55,6 @@ struct  sparse_orthogonal_basis
     std::unordered_map<std::size_t, sparse_vector> const&  vectors() const { return vectors_; }
 
 private:
-    std::size_t  dim_;
     std::unordered_map<std::size_t, sparse_vector>  vectors_{};
 };
 

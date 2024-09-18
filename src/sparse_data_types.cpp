@@ -102,7 +102,6 @@ sparse_vector  operator*(scalar c, sparse_vector const&  v)
 
 sparse_vector  sparse_orthogonal_basis::operator()(std::size_t const  idx) const
 {
-    ASSUMPTION(idx < dim_);
     auto const  it = vectors_.find(idx);
     return it == vectors_.end() ? sparse_vector::axis(idx) : it->second;
 }
@@ -110,7 +109,6 @@ sparse_vector  sparse_orthogonal_basis::operator()(std::size_t const  idx) const
 
 sparse_vector&  sparse_orthogonal_basis::operator[](std::size_t const  idx)
 {
-    ASSUMPTION(idx < dim_);
     return vectors_.insert({ idx, sparse_vector{} }).first->second;
 }
 
@@ -127,7 +125,24 @@ sparse_vector  sparse_orthogonal_basis::out(sparse_vector const& v) const
 sparse_vector  sparse_orthogonal_basis::in(sparse_vector const& v) const
 {
     sparse_vector  w;
-    for (std::size_t  i = 0UL; i < dim_; ++i)
+
+    if (v.coords().empty())
+        return w;
+
+    std::size_t  lo{ v.coords().begin()->first };
+    std::size_t  hi{ lo };
+    for (auto  it = std::next(v.coords().begin()); it != v.coords().end(); ++it)
+    {
+        lo = std::min(lo, it->first);
+        hi = std::max(hi, it->first);
+    }
+    for (auto  it = vectors_.begin(); it != vectors_.end(); ++it)
+    {
+        lo = std::min(lo, it->first);
+        hi = std::max(hi, it->first);
+    }
+
+    for (std::size_t  i = lo; i <= hi; ++i)
     {
         sparse_vector const u{ this->operator()(i) };
         scalar const  c{ dot(u,v) / dot(u,u) };
