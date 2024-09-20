@@ -2,6 +2,7 @@
 #include <utility/assumptions.hpp>
 #include <utility/invariants.hpp>
 #include <utility/development.hpp>
+#include <unordered_set>
 #include <algorithm>
 #include <cmath>
 
@@ -129,20 +130,13 @@ sparse_vector  sparse_orthogonal_basis::in(sparse_vector const& v) const
     if (v.coords().empty())
         return w;
 
-    std::size_t  lo{ v.coords().begin()->first };
-    std::size_t  hi{ lo };
-    for (auto  it = std::next(v.coords().begin()); it != v.coords().end(); ++it)
-    {
-        lo = std::min(lo, it->first);
-        hi = std::max(hi, it->first);
-    }
+    std::unordered_set<std::size_t>  indices;
+    for (auto  it = v.coords().begin(); it != v.coords().end(); ++it)
+        indices.insert(it->first);
     for (auto  it = vectors_.begin(); it != vectors_.end(); ++it)
-    {
-        lo = std::min(lo, it->first);
-        hi = std::max(hi, it->first);
-    }
+        indices.insert(it->first);
 
-    for (std::size_t  i = lo; i <= hi; ++i)
+    for (std::size_t  i : indices)
     {
         sparse_vector const u{ this->operator()(i) };
         scalar const  c{ dot(u,v) / dot(u,u) };
