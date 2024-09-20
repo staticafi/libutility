@@ -101,6 +101,22 @@ sparse_vector  operator*(scalar c, sparse_vector const&  v)
 }
 
 
+void  decompose(sparse_vector const&  v, sparse_vector const&  u, sparse_vector&  v_parallel_to_u, sparse_vector&  v_orthogonal_to_u)
+{
+    v_parallel_to_u = (dot(v, u) / dot(u, u)) * u;
+    v_orthogonal_to_u = v - v_parallel_to_u;
+}
+
+
+bool  isfinite(sparse_vector const&  v)
+{
+    for (auto  it = v.coords().begin(); it != v.coords().end(); ++it)
+        if (!std::isfinite(it->second))
+            return false;
+    return true;
+}
+
+
 sparse_vector  sparse_orthogonal_basis::operator()(std::size_t const  idx) const
 {
     auto const  it = vectors_.find(idx);

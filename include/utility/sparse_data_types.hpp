@@ -41,6 +41,10 @@ sparse_vector  operator*(scalar c, sparse_vector const&  v);
 inline sparse_vector  operator*(sparse_vector const&  v, scalar const  c) { return c * v; }
 inline sparse_vector  operator/(sparse_vector const&  v, scalar const  c) { return (1.0/c) * v; }
 
+void  decompose(sparse_vector const&  v, sparse_vector const&  u, sparse_vector&  v_parallel_to_u, sparse_vector&  v_orthogonal_to_u);
+
+bool  isfinite(sparse_vector const&  v);
+
 
 struct  sparse_orthogonal_basis
 {
