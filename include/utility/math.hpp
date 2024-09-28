@@ -38,6 +38,11 @@ vec<T> mkvec(std::size_t const n, S const& value = S{0})
     return vec<T>(n, (T)value);
 }
 
+inline vecf64 mkvecf64(std::size_t const n, float_64_bit const& value = 0.0)
+{
+    return mkvec<float_64_bit>(n, value);
+}
+
 template<typename T, typename S>
 mat<T> mkmat(std::size_t const m, std::size_t const n, S const& value = S{0})
 {
@@ -111,6 +116,14 @@ vec<T>&  column(mat<T>& m, std::size_t const i)
     return m.at(i);
 }
 
+template<typename T>
+vec<T> const&  row(mat<T> const& m, std::size_t const i)
+{
+    vec<T> v(columns(m));
+    for (std::size_t  j = 0UL; j < size(v); ++j)
+        at(v,j) = at(m,j,i);
+    return v;
+}
 
 template<typename T, typename S>
 vec<T>& set(vec<T>& v, S const& value = S{0})
