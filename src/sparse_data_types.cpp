@@ -73,7 +73,7 @@ sparse_vector  operator-(sparse_vector const&  u, sparse_vector const&  v)
 
 scalar  dot(sparse_vector const&  u, sparse_vector const&  v)
 {
-    scalar  w;
+    scalar  w{ 0 };
     for (auto  it = v.coords().begin(); it != v.coords().end(); ++it)
         w += u(it->first) * it->second;
     return w;
