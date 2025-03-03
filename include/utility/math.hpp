@@ -407,6 +407,19 @@ bool normalize(vec<T>& v)
     return true;
 }
 
+template<typename T>
+bool  equal(vec<T> const&  u, vec<T> const&  v)
+{
+    if (u.size() != v.size())
+        return false;
+    auto itu = u.begin();
+    auto itv = v.begin();
+    for ( ; itu != u.end(); ++itu, ++itv)
+        if (*itu != *itv)
+            return false;
+    return true;
+}
+
 template<typename float_type>
 bool isfinite(vec<float_type> const& v)
 {
