@@ -671,4 +671,11 @@ void  bytes_to_bits(vecu8 const&  bytes, vecb&  bits);
 void  bytes_to_bits(natural_8_bit const*  begin, natural_8_bit const* end, vecb&  bits);
 
 
+template<typename T>
+void  push_back(vecu8&  dst, T const&  value)
+{
+    dst.insert(dst.end(), (natural_8_bit*)&value, ((natural_8_bit*)&value) + sizeof(T));
+}
+
+
 #endif
