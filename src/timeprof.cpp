@@ -424,8 +424,8 @@ std::ostream& print_time_profile_data_to_stream(
             "    <title>Time Profile Log</title>\n"
             "    <style type=\"text/css\">\n"
             "        body {\n"
-            "            background-color: white;\n"
-            "            color: black;\n"
+            "            background-color: #202020;\n"
+            "            color: #d0d0d0;\n"
 //            "            width: 480pt;\n"
 //            "            height: 720pt;\n"
             "            margin-left: auto;\n"
@@ -444,7 +444,6 @@ std::ostream& print_time_profile_data_to_stream(
             "            text-align:right;\n"
             "            padding: 3pt;\n"
             "        }\n"
-            "        tr:nth-child(even){background-color: #f2f2f2}\n"
             "   </style>\n"
             "</head>\n"
             "<body>\n"
@@ -551,7 +550,7 @@ std::ostream& print_time_profile_data_to_stream(
     os <<   "    <tr></tr>\n"
             ;
 
-    os <<   "    <tr style=\"background-color: white\">\n"
+    os <<   "    <tr>\n"
             "        <th>Summary</th>\n"
             "        <th>" << data.size() << "</th>\n"
             "        <th></th>\n"
