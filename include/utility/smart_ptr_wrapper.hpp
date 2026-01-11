@@ -87,11 +87,11 @@ unique_ptr_wrapper<T>  make_unique_wrapper(Args&&... args)
 }
 
 #   if PLATFORM() != PLATFORM_WINDOWS() && BUILD_RELEASE() == 0
-#       define shared_ptr_wrapper detail::shared_ptr_wrapper
-#       define weak_ptr_wrapper detail::weak_ptr_wrapper
-#       define unique_ptr_wrapper detail::unique_ptr_wrapper
-#       define make_shared_wrapper detail::make_shared_wrapper
-#       define make_unique_wrapper detail::make_unique_wrapper
+#       define shared_ptr_wrapper ::detail::shared_ptr_wrapper
+#       define weak_ptr_wrapper ::detail::weak_ptr_wrapper
+#       define unique_ptr_wrapper ::detail::unique_ptr_wrapper
+#       define make_shared_wrapper ::detail::make_shared_wrapper
+#       define make_unique_wrapper ::detail::make_unique_wrapper
 #   else
 #       define shared_ptr_wrapper std::shared_ptr
 #       define weak_ptr_wrapper std::weak_ptr
