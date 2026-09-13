@@ -139,7 +139,7 @@ void  visualize(BreakPointID const id)
     {
         std::lock_guard<std::mutex> const lock(VisualizerBase::s_mutex);
         if (VisualizerBase::s_stop_flag)
-            return;
+            throw VisualizerTerminationException{};
         s_current_breakpoint_id = id;
         VisualizerBase::s_render = true;
     }
@@ -148,7 +148,9 @@ void  visualize(BreakPointID const id)
     {
         {
             std::lock_guard<std::mutex> const lock(VisualizerBase::s_mutex);
-            if (!VisualizerBase::s_render || VisualizerBase::s_stop_flag)
+            if (VisualizerBase::s_stop_flag)
+                throw VisualizerTerminationException{};
+            if (!VisualizerBase::s_render)
                 break;
         }
         std::this_thread::yield();

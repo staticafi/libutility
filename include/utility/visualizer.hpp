@@ -15,6 +15,7 @@ struct VisualizerBase
     static bool s_render;
 
     VisualizerBase() {}
+    virtual ~VisualizerBase() {}
 
     virtual void next_frame() {}
 
@@ -33,6 +34,8 @@ using ConstructorType = std::function<std::unique_ptr<VisualizerBase>()>;
 
 void  create_visualizer(ConstructorType const& constructor);
 void  destroy_visualizer();
+
+struct  VisualizerTerminationException {};
 
 
 }
