@@ -1,11 +1,16 @@
 #ifndef VISUALIZER_BREAKPOINT_HPP_INCLUDED
 #   define VISUALIZER_BREAKPOINT_HPP_INCLUDED
 
+#   include <source_location>
 #   include <cstdint>
 
 #   define VISUALIZER_BREAKPOINT()                                                          \
-        do { static ::visualizer::BreakPointID const id =                           \
-                ::visualizer::register_breakpoint(__FILE__,__LINE__,__FUNCTION__);  \
+        do { static ::visualizer::BreakPointID const id =                                   \
+                ::visualizer::register_breakpoint(                                          \
+                    std::source_location::current().file_name(),                            \
+                    std::source_location::current().line(),                                 \
+                    std::source_location::current().function_name()                         \
+                    );                                                                      \
              ::visualizer::on_breakpoint_hit(id); } while (false)
 
 namespace visualizer {
