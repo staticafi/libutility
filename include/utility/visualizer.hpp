@@ -3,39 +3,38 @@
 
 #   include <functional>
 #   include <memory>
-#   include <mutex>
 
 namespace visualizer {
 
 
-struct VisualizerBase
-{
-    static std::mutex  s_mutex;
-    static bool s_stop_flag;
-    static bool s_render;
+struct Visualizer;
+using ConstructorType = std::function<std::unique_ptr<Visualizer>()>;
 
-    VisualizerBase() {}
-    virtual ~VisualizerBase() {}
+
+struct Visualizer
+{
+    Visualizer() {}
+    virtual ~Visualizer() {}
 
     virtual void next_frame() {}
+    virtual void on_data_changed() {}
 
-    bool can_render() const;
-    void set_waiting_for_content() const;
+    void stop();
 
 private:
 
-    VisualizerBase(VisualizerBase const&) = delete;
-    VisualizerBase(VisualizerBase&&) = delete;
-    VisualizerBase& operator=(VisualizerBase const&) = delete;
-    VisualizerBase& operator=(VisualizerBase&&) = delete;
+    Visualizer(Visualizer const&) = delete;
+    Visualizer(Visualizer&&) = delete;
+    Visualizer& operator=(Visualizer const&) = delete;
+    Visualizer& operator=(Visualizer&&) = delete;
 };
 
-using ConstructorType = std::function<std::unique_ptr<VisualizerBase>()>;
 
-void  create_visualizer(ConstructorType const& constructor);
-void  destroy_visualizer();
+struct  TerminationException {};
 
-struct  VisualizerTerminationException {};
+
+void  create(ConstructorType const& constructor);
+void  destroy();
 
 
 }
