@@ -3,6 +3,7 @@
 #include <boost/algorithm/string.hpp>
 #include <unordered_set>
 #include <stdexcept>
+#include <string_view>
 
 
 static std::vector<std::string> const  empty_vector;
@@ -158,6 +159,7 @@ void  program_options_base::parse()
     m_parsed = true;
 
     std::size_t  positional_i = 0U;
+    std::unordered_set<std::string_view>  parsed_keys;
     std::string  processed_key;
 
     auto const  check_arity = [&]()
@@ -183,7 +185,7 @@ void  program_options_base::parse()
             processed_key = arg.substr(2);
             if (m_descriptions.count(processed_key) == 0UL)
                 throw std::runtime_error("Unknown option " + arg);
-            if (m_values.count(processed_key) != 0UL)
+            if (!parsed_keys.insert(std::string_view(arg).substr(2)).second)
                 throw std::runtime_error("Option " + arg + " specified more than once");
 
             set_value(processed_key);
@@ -200,9 +202,10 @@ void  program_options_base::parse()
                 throw std::runtime_error("Too many positional arguments");
 
             std::string const& key = m_positional.at(positional_i++);
-            if (m_values.count(key) != 0UL)
+            if (!parsed_keys.insert(key).second)
                 throw std::runtime_error("Option " + key + " specified more than once");
 
+            set_value(key);
             add_value(key, arg);
         }
 
