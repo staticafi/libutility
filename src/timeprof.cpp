@@ -2,6 +2,7 @@
 #include <utility/timestamp.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <list>

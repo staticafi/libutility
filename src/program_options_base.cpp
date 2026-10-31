@@ -1,9 +1,9 @@
 #include <utility/program_options_base.hpp>
-#include <utility/msgstream.hpp>
-#include <utility/log.hpp>
 #include <utility/assumptions.hpp>
 #include <boost/algorithm/string.hpp>
 #include <unordered_set>
+#include <stdexcept>
+#include <string_view>
 
 
 static std::vector<std::string> const  empty_vector;
@@ -158,67 +158,66 @@ void  program_options_base::parse()
         return;
     m_parsed = true;
 
-    bool  failed = false;
-    bool  visited_non_positional = false;
+    std::size_t  positional_i = 0U;
+    std::unordered_set<std::string_view>  parsed_keys;
     std::string  processed_key;
-    std::size_t  processed_i;
-    for (std::size_t  i = 1U; i < m_arguments.size(); ++i)
+
+    auto const  check_arity = [&]()
     {
-        std::string const&  arg = m_arguments.at(i);
+        if ( processed_key.empty() )
+            return;
+
+        const auto key_arity = arity(processed_key);
+        const auto value_count = values(processed_key).size();
+
+        if (!is_arity_valid(value_count, key_arity))
+            throw std::runtime_error("Wrong number of values for --" + processed_key
+                + ": expected " + key_arity + ", got " + std::to_string(value_count));
+    };
+
+    for (std::size_t i = 1U; i < m_arguments.size(); ++i)
+    {
+        std::string const& arg = m_arguments.at(i);
+
         if (boost::starts_with(arg, "--"))
         {
-            visited_non_positional = true;
-            if (!processed_key.empty() && !is_arity_valid(values(processed_key).size(), arity(processed_key)))
-            {
-                LOG(LSL_ERROR, "In argument " << i << ", --" << processed_key << ": wrong number of values. "
-                               "Expected " << arity(processed_key) << ", but passed " << values(processed_key).size());
-                failed = true;
-            }
+            check_arity();
             processed_key = arg.substr(2);
-            processed_i = i;
             if (m_descriptions.count(processed_key) == 0UL)
-            {
-                LOG(LSL_ERROR, "In positional argument " << i << ": the option '--" << processed_key << "' is unknown.");
-                failed = true;
-                break;
-            }
-            else
-                set_value(processed_key);
+                throw std::runtime_error("Unknown option " + arg);
+            if (!parsed_keys.insert(std::string_view(arg).substr(2)).second)
+                throw std::runtime_error("Option " + arg + " specified more than once");
+
+            set_value(processed_key);
         }
         else if (!processed_key.empty())
-            add_value(processed_key, arg);
-        else if (!visited_non_positional)
         {
-            if (i >= m_positional.size())
-            {
-                if (i == m_positional.size())
-                    LOG(LSL_ERROR, "In positional argument " << i << ": too many positional arguments");
-                failed = true;
-                continue;
-            }
-            if (!values(m_positional.at(i)).empty() || !is_arity_valid(1, arity(m_positional.at(i))))
-            {
-                LOG(LSL_ERROR, "In positional argument " << i << ": wrong number of values. "
-                    "Expected 1, but has " << values(m_positional.at(i)).size());
-                failed = true;
-            }
-            add_value(m_positional.at(i), arg);
+            add_value(processed_key, arg);
         }
         else
         {
-            LOG(LSL_ERROR, "In argument " << i << ": positional argument after non-positional.");
-            failed = true;
+            if (arg.size() > 1U && arg.front() == '-')
+                throw std::runtime_error("Unknown option " + arg);
+            if (positional_i >= m_positional.size())
+                throw std::runtime_error("Too many positional arguments");
+
+            std::string const& key = m_positional.at(positional_i++);
+            if (!parsed_keys.insert(key).second)
+                throw std::runtime_error("Option " + key + " specified more than once");
+
+            set_value(key);
+            add_value(key, arg);
+        }
+
+        if (!processed_key.empty())
+        {
+            std::string const&  spec = arity(processed_key);
+            if (spec != "*" && spec != "+" && is_arity_valid(values(processed_key).size(), spec))
+                processed_key.clear();
         }
     }
-    if (!processed_key.empty() && !is_arity_valid(values(processed_key).size(), arity(processed_key)))
-    {
-        LOG(LSL_ERROR, "In argument " << processed_i << ", --" << processed_key << ": wrong number of values. "
-            "Expected " << arity(processed_key) << ", but passed " << values(processed_key).size());
-        failed = true;
-    }
 
-    if (failed)
-        throw std::runtime_error("Processing program options has failed. See the log file for more details.");
+    check_arity();
 }
 
 
